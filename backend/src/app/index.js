@@ -2,12 +2,25 @@ import express from 'express'
 import path from 'path'
 import {ENV} from '../lib/env.js'
 import { fileURLToPath } from "url";
+import { clerkMiddleware } from '@clerk/express'
+import { webhookRouter } from '../routes/webhookRouter.js';
+
+
+
+const __dirname = path.resolve()
 
 
 const app = express()
 
-const __dirname = path.resolve()
 
+
+app.use(clerkMiddleware())
+
+app.use('/api/webhook',webhookRouter)
+
+
+
+app.use(express.json())
 app.use('/books',(req,res)=>{
     res.json({
         message:"this is the route for books"

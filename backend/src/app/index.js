@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import { clerkMiddleware } from '@clerk/express'
 import { webhookRouter } from '../routes/webhookRouter.js';
 import { connectDB } from '../db/index.js';
+import { errorHandler } from '../middlewares/ErrorMiddleware.js';
 
 // dynamic path for finding files in production 
 const __dirname = path.resolve()
@@ -13,17 +14,17 @@ const __dirname = path.resolve()
 const app = express()
 
 
-// establish connecting with db 
+// establish connection with db 
 connectDB()
 
 
 
 // webhook handling 
-app.use(clerkMiddleware())
 app.use('/api/webhook',webhookRouter)
 
 
 // app routes 
+app.use(clerkMiddleware())
 app.use(express.json())
 app.use('/books',(req,res)=>{
     res.json({
@@ -49,6 +50,6 @@ app.get("/{*any}",(req,res)=>{
 })
 }
 
-
+app.use(errorHandler)
 
 export default app

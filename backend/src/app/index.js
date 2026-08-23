@@ -12,7 +12,7 @@ const __dirname = path.resolve()
 
 // app instance created 
 const app = express()
-
+app.use(clerkMiddleware())
 
 // establish connection with db 
 connectDB()
@@ -24,7 +24,7 @@ app.use('/api/webhook',webhookRouter)
 
 
 // app routes 
-app.use(clerkMiddleware())
+
 app.use(express.json())
 app.use('/books',(req,res)=>{
     res.json({

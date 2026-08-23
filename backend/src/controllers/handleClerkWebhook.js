@@ -12,10 +12,10 @@ export const handleClerkWebhook = catchError(async function(req,res){
 
     let event;
     const wh = new Webhook(ENV.CLERK_WEBHOOK_SECRET);
-
     try {
         event = wh.verify(req.body, svixHeaders);
         const processWebhookStatus = await processClerkWebhook(req.headers['svix-id'],event)
+        console.log(processWebhookStatus)
         res.status(200).send('ok');
     } catch (err) {
       console.error('Webhook signature verification failed:', err.message);

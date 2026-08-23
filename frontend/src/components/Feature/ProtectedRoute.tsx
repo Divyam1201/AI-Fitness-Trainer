@@ -13,13 +13,14 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     <>
      <SignedIn>
   <div className="h-screen flex flex-col">
+    <div className='bg-grid inset'></div>
     <div className=' max-h-max'>
     <AppNavbar />
     </div>
-    <main className="overflow-y-scroll h-full">
+    <main className="overflow-y-scroll h-[85vh]">
       {children}
     </main>
-    <div className=' max-h-max'>
+    <div className='max-h-[15vh] h-max'>
     <Footer />
     </div>
   </div>

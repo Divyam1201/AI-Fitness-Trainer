@@ -6,8 +6,8 @@ const Profile = () => {
   const { user } = useUser()
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[#020817] via-[#0b1120] to-[#020817] text-[#edf6ff]">
-      <div className="absolute inset-0 pointer-events-none" />
+    <div className="min-h-screen relative overflow-hidden text-[#edf6ff]">
+      <div className="absolute inset-0 pointer-events-none bg-grid" />
       <main className="max-w-[1200px] w-full px-4 mx-auto py-8 grid md:grid-cols-[1.2fr_0.8fr] gap-6">
         <div className="p-6 rounded-xl bg-[rgba(15,23,42,0.74)] border border-[rgba(148,163,184,0.18)]">
           <div className="flex items-center gap-4">

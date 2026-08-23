@@ -20,7 +20,7 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     <main className="overflow-y-scroll h-[85vh]">
       {children}
     </main>
-    <div className='max-h-[15vh] h-max'>
+    <div className='flex items-start h-[15vh]'>
     <Footer />
     </div>
   </div>

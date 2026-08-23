@@ -1,9 +1,18 @@
-import { UserButton, useUser } from '@clerk/clerk-react'
-import { ActivityIcon, Bell, BrainCircuit, ChevronRight, Dumbbell, Flame, TrendingUp } from 'lucide-react'
-import { Link, NavLink } from 'react-router'
+import { useUser } from '@clerk/clerk-react'
+import { ActivityIcon, BrainCircuit, ChevronRight, Flame, TrendingUp } from 'lucide-react'
+import { Link} from 'react-router'
+import { useState } from 'react'
+
+type QuickStat = { label: string; value: string; detail: string }
 
 const Dashboard = () => {
+  const [quickStats,setQuickStats] = useState<QuickStat[]>([
+    { label: 'Calories burned', value: '1,240', detail: 'this week' },
+    { label: 'Protein target', value: '160g', detail: 'daily' },
+    { label: 'Hydration', value: '2.7L', detail: 'today' },
+  ])
 
+  const [currentRoutine,setCurrentRoutine] = useState<Array<Record<string, string>>>([{}])
     const weeklyPlan = [
   { day: 'Mon', focus: 'Upper body push', intensity: 'Intensity 8/10', time: '42 min' },
   { day: 'Tue', focus: 'Lower body power', intensity: 'Intensity 7/10', time: '38 min' },
@@ -12,11 +21,7 @@ const Dashboard = () => {
   { day: 'Fri', focus: 'Conditioning circuit', intensity: 'Intensity 9/10', time: '30 min' },
 ]
 
-const quickStats = [
-  { label: 'Calories burned', value: '1,240', detail: 'this week' },
-  { label: 'Protein target', value: '160g', detail: 'daily' },
-  { label: 'Hydration', value: '2.7L', detail: 'today' },
-]
+  
 
 
   const { user } = useUser()
@@ -24,43 +29,20 @@ const quickStats = [
   return (
     <div className="fitness-shell app-shell">
       <div className="bg-grid" />
-
-      <header className="topbar container-shell app-header">
-        <div className="brand-mark">
-          <div className="brand-icon">
-            <Dumbbell className="h-4 w-4" />
-          </div>
-          <span>FitFlow AI</span>
-        </div>
-
-        <nav className="app-nav">
-          <NavLink to="/dashboard">Dashboard</NavLink>
-          <NavLink to="/generate">Generate</NavLink>
-          <NavLink to="/profile">Profile</NavLink>
-        </nav>
-
-        <div className="header-actions">
-          <button className="icon-button" aria-label="Notifications">
-            <Bell className="h-4 w-4" />
-          </button>
-          <UserButton afterSignOutUrl="/" />
-        </div>
-      </header>
-
-      <main className="container-shell dashboard-layout">
-        <section className="welcome-panel glass-panel">
+      <main className={`container-shell dashboard-layout ${!currentRoutine.length?"h-[70vh]":"h-auto"}`}>
+        {!currentRoutine.length?<div className='flex items-center justify-center'><section className="welcome-panel flex-col border glass-panel">
           <div>
-            <span className="eyebrow-badge">Good morning, {user?.firstName ?? 'athlete'}</span>
+            <span className="eyebrow-badge">Hey There, {user?.firstName ?? 'athlete'}</span>
             <h1>Let&apos;s build your next win.</h1>
           </div>
           <Link to="/generate" className="primary-action compact">
             Generate workout
             <ChevronRight className="h-4 w-4" />
           </Link>
-        </section>
+        </section></div>:null}
 
-        <section className="stats-row">
-          {quickStats.map((stat) => (
+        {currentRoutine.length?<><section className="stats-row">
+          {quickStats.map((stat: QuickStat) => (
             <div key={stat.label} className="glass-panel stat-card">
               <span>{stat.label}</span>
               <strong>{stat.value}</strong>
@@ -117,7 +99,7 @@ const quickStats = [
               <li><Flame className="h-4 w-4" /> Fat loss pace is in range</li>
             </ul>
           </div>
-        </section>
+        </section></>:null}
       </main>
     </div>
   )

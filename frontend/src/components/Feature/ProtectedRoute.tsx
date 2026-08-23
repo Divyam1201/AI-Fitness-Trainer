@@ -4,12 +4,26 @@ import {
   SignedIn,
   SignedOut,
 } from '@clerk/clerk-react'
+import AppNavbar from './AppNavbar';
+import Footer from './Footer';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
   return (
     <>
-      <SignedIn>{children}</SignedIn>
+     <SignedIn>
+  <div className="h-screen flex flex-col">
+    <div className=' max-h-max'>
+    <AppNavbar />
+    </div>
+    <main className="overflow-y-scroll h-full">
+      {children}
+    </main>
+    <div className=' max-h-max'>
+    <Footer />
+    </div>
+  </div>
+</SignedIn>
       <SignedOut>
         <Navigate to="/signin" replace />
       </SignedOut>

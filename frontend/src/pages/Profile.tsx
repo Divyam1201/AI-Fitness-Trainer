@@ -1,76 +1,53 @@
-import { UserButton, useUser } from "@clerk/clerk-react"
-import { Dumbbell, Flame, HeartPulse, Target } from "lucide-react"
-import { NavLink } from "react-router"
+import { useUser } from "@clerk/clerk-react"
+import {  Flame, HeartPulse, Target } from "lucide-react"
 
 const Profile = () => {
   
   const { user } = useUser()
 
   return (
-    <div className="fitness-shell app-shell">
-      <div className="bg-grid" />
-
-      <header className="topbar container-shell app-header">
-        <div className="brand-mark">
-          <div className="brand-icon">
-            <Dumbbell className="h-4 w-4" />
-          </div>
-          <span>FitFlow AI</span>
-        </div>
-        <nav className="app-nav">
-          <NavLink to="/dashboard">Dashboard</NavLink>
-          <NavLink to="/generate">Generate</NavLink>
-          <NavLink to="/profile">Profile</NavLink>
-        </nav>
-        <div className="header-actions">
-          <UserButton afterSignOutUrl="/" />
-        </div>
-      </header>
-
-      <main className="container-shell profile-layout">
-        <div className="glass-panel profile-overview">
-          <div className="profile-header-row">
-            <div className="avatar-ring">
-              {user?.firstName?.charAt(0)?.toUpperCase() ?? 'A'}
-            </div>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[#020817] via-[#0b1120] to-[#020817] text-[#edf6ff]">
+      <div className="absolute inset-0 pointer-events-none" />
+      <main className="max-w-[1200px] w-full px-4 mx-auto py-8 grid md:grid-cols-[1.2fr_0.8fr] gap-6">
+        <div className="p-6 rounded-xl bg-[rgba(15,23,42,0.74)] border border-[rgba(148,163,184,0.18)]">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-sky-300/20 to-cyan-300/10 flex items-center justify-center text-white font-bold">{user?.firstName?.charAt(0)?.toUpperCase() ?? 'A'}</div>
             <div>
-              <p className="uppercase-label">Athlete profile</p>
-              <h2>{user?.fullName ?? 'Alex Morgan'}</h2>
+              <p className="text-sm uppercase tracking-wide text-sky-200">Athlete profile</p>
+              <h2 className="text-2xl font-semibold">{user?.fullName ?? 'Alex Morgan'}</h2>
             </div>
           </div>
 
-          <div className="profile-stats-grid">
-            <div>
-              <span>Age</span>
-              <strong>29</strong>
+          <div className="grid grid-cols-2 gap-4 mt-6">
+            <div className="p-3 bg-[rgba(15,23,42,0.6)] rounded-lg">
+              <span className="text-sm text-slate-300">Age</span>
+              <strong className="block">29</strong>
             </div>
-            <div>
-              <span>Height</span>
-              <strong>5&apos;10&quot;</strong>
+            <div className="p-3 bg-[rgba(15,23,42,0.6)] rounded-lg">
+              <span className="text-sm text-slate-300">Height</span>
+              <strong className="block">5'10"</strong>
             </div>
-            <div>
-              <span>Weight</span>
-              <strong>162 lb</strong>
+            <div className="p-3 bg-[rgba(15,23,42,0.6)] rounded-lg">
+              <span className="text-sm text-slate-300">Weight</span>
+              <strong className="block">162 lb</strong>
             </div>
-            <div>
-              <span>Goal</span>
-              <strong>Lean bulk</strong>
+            <div className="p-3 bg-[rgba(15,23,42,0.6)] rounded-lg">
+              <span className="text-sm text-slate-300">Goal</span>
+              <strong className="block">Lean bulk</strong>
             </div>
           </div>
         </div>
 
-        <div className="glass-panel goals-panel">
-          <div className="panel-header">
-            <div>
-              <p className="uppercase-label">Lifestyle</p>
-              <h3>Current goals</h3>
-            </div>
+        <div className="p-6 rounded-xl bg-[rgba(15,23,42,0.74)] border border-[rgba(148,163,184,0.18)]">
+          <div>
+            <p className="text-sm uppercase tracking-wide text-sky-200">Lifestyle</p>
+            <h3 className="text-lg font-semibold">Current goals</h3>
           </div>
 
-          <ul className="goal-list">
-            <li><Target className="h-4 w-4" /> Add 8 lb of lean muscle</li>
-            <li><Flame className="h-4 w-4" /> Maintain 3-4 high-intensity sessions</li>
-            <li><HeartPulse className="h-4 w-4" /> Prioritize sleep and recovery</li>
+          <ul className="mt-4 space-y-3 text-slate-200">
+            <li className="flex items-center gap-2"><Target className="h-4 w-4" /> Add 8 lb of lean muscle</li>
+            <li className="flex items-center gap-2"><Flame className="h-4 w-4" /> Maintain 3-4 high-intensity sessions</li>
+            <li className="flex items-center gap-2"><HeartPulse className="h-4 w-4" /> Prioritize sleep and recovery</li>
           </ul>
         </div>
       </main>

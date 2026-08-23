@@ -8,6 +8,7 @@ import Profile from './pages/Profile'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/Feature/ProtectedRoute'
+import Footer from './components/Feature/Footer'
 
 
 function App() {
@@ -18,8 +19,8 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/generate" element={<ProtectedRoute><GenerateProgram /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/signin" element={<SignInPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/signin/*" element={<SignInPage />} />
+        <Route path="/signup/*" element={<SignUpPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

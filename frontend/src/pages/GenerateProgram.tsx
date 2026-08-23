@@ -15,6 +15,7 @@ const GenerateProgram = () => {
   const [isConnecting, setIsConnecting] = useState(false)
   const [callError, setCallError] = useState<string | null>(null)
   const vapiClientRef = useRef<any>(null)
+  // @ts-ignore 
   const Vapi = VapiModule.default.default
   // Initialize VAPI client
   useEffect(() => {

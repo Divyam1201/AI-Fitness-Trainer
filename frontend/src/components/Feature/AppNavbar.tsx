@@ -1,5 +1,5 @@
 import { UserButton } from '@clerk/clerk-react'
-import { Bell, Dumbbell } from 'lucide-react'
+import { Dumbbell } from 'lucide-react'
 import { NavLink } from 'react-router'
 
 const AppNavbar = () => {

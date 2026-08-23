@@ -1,18 +1,17 @@
 import { useUser } from '@clerk/clerk-react'
 import { ActivityIcon, BrainCircuit, ChevronRight, Flame, TrendingUp } from 'lucide-react'
 import { Link} from 'react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-type QuickStat = { label: string; value: string; detail: string }
 
 const Dashboard = () => {
-  const [quickStats,setQuickStats] = useState<QuickStat[]>([
+  const [quickStats,setQuickStats] = useState<any>()
+const demoQuickStats = [
     { label: 'Calories burned', value: '1,240', detail: 'this week' },
     { label: 'Protein target', value: '160g', detail: 'daily' },
     { label: 'Hydration', value: '2.7L', detail: 'today' },
-  ])
-
-  const [currentRoutine,setCurrentRoutine] = useState<Array<Record<string, string>>>([{}])
+  ]
+  const [currentRoutine,setCurrentRoutine] = useState<Array<Record<string, string>>>([])
     const weeklyPlan = [
   { day: 'Mon', focus: 'Upper body push', intensity: 'Intensity 8/10', time: '42 min' },
   { day: 'Tue', focus: 'Lower body power', intensity: 'Intensity 7/10', time: '38 min' },
@@ -20,7 +19,10 @@ const Dashboard = () => {
   { day: 'Thu', focus: 'Strength pull', intensity: 'Intensity 8/10', time: '45 min' },
   { day: 'Fri', focus: 'Conditioning circuit', intensity: 'Intensity 9/10', time: '30 min' },
 ]
-
+useEffect(()=>{
+  setQuickStats(demoQuickStats)
+setCurrentRoutine(weeklyPlan)
+},[])
   
 
 
@@ -42,7 +44,7 @@ const Dashboard = () => {
         </section></div>:null}
 
         {currentRoutine.length?<><section className="stats-row">
-          {quickStats.map((stat: QuickStat) => (
+          {quickStats.map((stat: any) => (
             <div key={stat.label} className="glass-panel stat-card">
               <span>{stat.label}</span>
               <strong>{stat.value}</strong>

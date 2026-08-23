@@ -8,7 +8,6 @@ import Profile from './pages/Profile'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/Feature/ProtectedRoute'
-import Footer from './components/Feature/Footer'
 
 
 function App() {

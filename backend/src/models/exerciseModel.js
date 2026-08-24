@@ -12,7 +12,7 @@ const workoutSchema = new Schema(
 
 const focusAndExerciseSchema = new Schema(
   {
-    focus: { type: String, required: true },
+    focusMuscle: { type: String, required: true },
     exercise: { type: [workoutSchema], required: true },
   },
   { _id: false },
@@ -21,6 +21,7 @@ const focusAndExerciseSchema = new Schema(
 const singleDayExerciseSchema = new Schema(
   {
     day: { type: String, required: true },
+      MuscleFocusDay:{type:String,required:true},
     items: { type: [focusAndExerciseSchema], required: true },
   },
   { _id: false },
@@ -30,10 +31,11 @@ const exerciseSchema = new Schema(
     clerkUserId:{type:String,required:true},
     vapiCallId : {type:String,required:true},
     daysPerWeek: { type: Number, required: true },
+    splitName:{type:String},
     days: { type: [singleDayExerciseSchema], required: true },
     status: {
       type: String,
-      enum: ['active', 'superseded'],
+      enum: ['active', 'inactive'],
       default: 'active',
       index: true
     }

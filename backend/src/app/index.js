@@ -6,12 +6,35 @@ import { clerkMiddleware } from '@clerk/express'
 import { webhookRouter } from '../routes/webhookRouter.js';
 import { connectDB } from '../db/index.js';
 import { errorHandler } from '../middlewares/ErrorMiddleware.js';
+import dietRouter from '../routes/dietRouter.js';
+import exerciseRouter from '../routes/exerciseRouter.js';
+import cors from 'cors';
 
 // dynamic path for finding files in production 
 const __dirname = path.resolve()
 
 // app instance created 
 const app = express()
+
+const allowedOrigins = [
+  'http://localhost:5173', // Vite default local port
+  'https://yourproductionfrontend.com' // Production domain
+];
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'], // Authorization is required for the Clerk Bearer token
+  credentials: true // Required if you use cookies or sessions
+}));
 app.use(clerkMiddleware())
 
 // establish connection with db 
@@ -24,13 +47,11 @@ app.use('/api/webhook',webhookRouter)
 
 
 // app routes 
-
 app.use(express.json())
-app.use('/books',(req,res)=>{
-    res.json({
-        message:"this is the route for books"
-    })
-})
+
+app.use('/api/diet',dietRouter)
+app.use('/api/exercisePlan',exerciseRouter)
+
 
 
 // route to check service health 

@@ -19,7 +19,7 @@ const app = express()
 
 const allowedOrigins = [
   'http://localhost:5173', // Vite default local port
-  'https://yourproductionfrontend.com' // Production domain
+  'https://ai-fitness-trainer-33qu.onrender.com' // Production domain
 ];
 app.use(cors({
   origin: (origin, callback) => {

@@ -1,7 +1,7 @@
 import { ENV } from "../lib/env.js";
 import {Webhook} from 'svix'
 import {AppError, catchError} from '../utils/AppErrorHandler.js'
-import { processClerkWebhook } from "../services/webhookServices.js";
+import { processWebhook } from "../services/webhookServices.js";
 
 export const handleClerkWebhook = catchError(async function(req,res){
     const svixHeaders = {
@@ -14,7 +14,7 @@ export const handleClerkWebhook = catchError(async function(req,res){
     const wh = new Webhook(ENV.CLERK_WEBHOOK_SECRET);
     try {
         event = wh.verify(req.body, svixHeaders);
-        const processWebhookStatus = await processClerkWebhook(req.headers['svix-id'],event)
+        const processWebhookStatus = await processWebhook(req.headers['svix-id'],event,'clerk')
         console.log(processWebhookStatus)
         res.status(200).send('ok');
     } catch (err) {

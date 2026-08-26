@@ -40,11 +40,11 @@ const metrics = [
           <span>FitFlow AI</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
+        {/* <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
           <a href="#features">Features</a>
           <a href="#results">Results</a>
           <a href="#coaching">Coaching</a>
-        </nav>
+        </nav> */}
 
         <div className="flex items-center gap-3">
           <Link to="/signin" className="py-1 px-1.5 md:px-3 md:py-2  rounded-lg bg-slate-700/50 border border-slate-600 text-xs md:text-sm">Sign in</Link>

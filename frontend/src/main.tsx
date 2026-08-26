@@ -5,9 +5,9 @@ import App from './App.tsx'
 
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ?? 'pk_test_placeholder'
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <ClerkProvider publishableKey={clerkPublishableKey}>
       <App />
     </ClerkProvider>
-  </StrictMode>,
+  // </StrictMode>,
 )

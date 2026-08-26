@@ -620,6 +620,97 @@
   gap: 1rem;
 }
 
+.day-program {
+  padding-bottom: 2rem;
+}
+
+.day-selector-panel {
+  padding: 1.25rem;
+}
+
+.day-selector {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.day-selector-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.65rem 0.4rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 0.8rem;
+  background: rgba(15, 23, 42, 0.5);
+  color: rgba(191, 219, 254, 0.7);
+}
+
+.day-selector-button strong {
+  color: #f8fbff;
+  font-size: 1.1rem;
+}
+
+.day-selector-button.selected {
+  background: rgba(34, 211, 238, 0.16);
+  border-color: rgba(34, 211, 238, 0.65);
+  color: #a5f3fc;
+  box-shadow: 0 0 18px rgba(34, 211, 238, 0.12);
+}
+
+.program-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.workout-group,
+.meal-group {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.program-row,
+.meal-row {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.75rem 0.85rem;
+  border-left: 2px solid rgba(34, 211, 238, 0.55);
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.program-row span,
+.meal-row span,
+.program-row small,
+.meal-row small,
+.muted-copy,
+.nutrition-total {
+  color: rgba(191, 219, 254, 0.7);
+  font-size: 0.8rem;
+}
+
+.meal-row small {
+  line-height: 1.45;
+}
+
+.nutrition-total {
+  margin: 1rem 0 0;
+  color: #a5f3fc;
+}
+
+@media (max-width: 640px) {
+  .day-selector {
+    gap: 0.3rem;
+  }
+
+  .day-selector-button {
+    padding-inline: 0.15rem;
+    font-size: 0.7rem;
+  }
+}
+
 .plan-list,
 .program-list,
 .goal-list,

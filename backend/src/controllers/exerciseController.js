@@ -3,7 +3,7 @@ import { exerciseModel } from "../models/exerciseModel.js";
 import { catchError } from "../utils/AppErrorHandler.js";
 
 const handlegetUserExPlan = catchError(async (req, res) => {
-  const { status } = req.params;
+  const { status } = req.query;
   console.log(status);
   const { isAuthenticated, userId } = getAuth(req);
 
@@ -22,21 +22,18 @@ const handlegetUserExPlan = catchError(async (req, res) => {
   }
   console.log(`Request made by Clerk User ID: ${userId}`);
 
-  return res.json({
-    message: "Success",
-    clerkUserId: userId,
-  });
+     return res.status(400).json({
+       message: "Failed status is required",
+       
+     });
 });
 
-const handleAddNewUserExPlan = catchError(async (req,res) => {
-  const userData = req.body()
-  console.log(userData)
+const handleAddUserNewExPlan = catchError(async (userData) => {
+ 
   const existingPlan = await exerciseModel.updateMany(
     { clerkUserId: userData.clerkUserId, status: "active" },
     { $set: { status: "inactive" } },
   );
   const addPlan = await exerciseModel.create(userData);
-  console.log(addPlan)
-res.json({message:addPlan})
 });
-export { handlegetUserExPlan, handleAddNewUserExPlan };
+export { handlegetUserExPlan, handleAddUserNewExPlan };

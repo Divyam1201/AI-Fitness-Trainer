@@ -9,6 +9,7 @@ import { errorHandler } from '../middlewares/ErrorMiddleware.js';
 import dietRouter from '../routes/dietRouter.js';
 import exerciseRouter from '../routes/exerciseRouter.js';
 import cors from 'cors';
+import eventRouter from '../routes/eventRouter.js';
 
 // dynamic path for finding files in production 
 const __dirname = path.resolve()
@@ -49,9 +50,9 @@ app.use('/api/webhook',webhookRouter)
 // app routes 
 app.use(express.json())
 
-app.use('/api/diet',dietRouter)
+app.use('/api/dietPlan',dietRouter)
 app.use('/api/exercisePlan',exerciseRouter)
-
+app.use('/api/event',eventRouter)
 
 
 // route to check service health 

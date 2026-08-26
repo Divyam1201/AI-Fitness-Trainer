@@ -6,7 +6,8 @@ const MealItemSchema = new Schema(
     calories: { type: Number, required: true },
     proteinGm: { type: Number },
     carbsGm: { type: Number },
-    fatsGm: { type: Number }
+    fatsGm: { type: Number },
+    ingredients:{type:String, required:true}
   },
   { _id: false }
 );
@@ -14,8 +15,8 @@ const MealItemSchema = new Schema(
 const DayMealSchema = new Schema(
   {
     mealType: { type: String, required: true }, // e.g. Breakfast, Lunch, Dinner, Snack
-    items: { type: [MealItemSchema], required: true }
-  },
+    items: { type: [MealItemSchema], required: true },
+      },
   { _id: false }
 );
 
@@ -39,20 +40,19 @@ const MacrosSchema = new Schema(
 const DietPlanSchema = new Schema(
   {
     clerkUserId: { type: String, required: true, index: true },
-    vapiCallId: { type: String, required: true }, // links to the VapiCallHistory that generated this
+    vapiCallId: { type: String,unique:true,required:false, }, 
     dailyCalorieTarget: { type: Number, required: true },
     macros: { type: MacrosSchema, required: true },
     meals: { type: [DailyMealsSchema], required: true },
     status: {
       type: String,
-      enum: ['active', 'superseded'],
+      enum: ['active', 'inactive'],
       default: 'active',
       index: true
     }
   },
   { timestamps: true } 
 );
-
 
 DietPlanSchema.index({ clerkUserId: 1, status: 1 });
 

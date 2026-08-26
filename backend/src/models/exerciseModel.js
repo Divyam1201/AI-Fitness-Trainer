@@ -29,7 +29,7 @@ const singleDayExerciseSchema = new Schema(
 const exerciseSchema = new Schema(
   {
     clerkUserId:{type:String,required:true},
-    vapiCallId : {type:String,required:true},
+    vapiCallId : {type:String,required:false,unique:true},
     daysPerWeek: { type: Number, required: true },
     splitName:{type:String},
     days: { type: [singleDayExerciseSchema], required: true },

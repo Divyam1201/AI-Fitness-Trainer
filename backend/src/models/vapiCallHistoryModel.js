@@ -1,28 +1,29 @@
 import mongoose from "mongoose";
 
-const VapiCallHistorySchema = new mongoose.Schema({
+const vapiCallHistorySchema = new mongoose.Schema({
   clerkUserId: { type: String, required: true, index: true },
-  callId: { type: String, required: true },
+  callId: { type: String, required: true,unique:true},
   intake: {
     age: { type: Number, required: true },
+    name:{type: String, required: true},
     gender: {
       type: String,
       enum: ["Male", "Female", "Other"]
       
     },
-    heightCm: { type: Number, required: true },
-    weightKg: { type: Number, required: true },
+    height: { type: String, required: true },
+    weight: { type: String, required: true },
     activityLevel: {
       type: String,
-      enum: ["Sedentary", "Moderate", "Active", "Very Active"]
     },
     fitnessGoal: {
       type: String,
-      enum: ["Lose Weight", "Gain Muscle", "Maintain", "Improve Health"]
+    },
+    fitnessLevel: {
+      type: String,
     },
     dietaryPreference: {
       type: String,
-      enum: ["Vegetarian", "Vegan", "Non-Vegetarian"]
     },
     mealsPerDay: { type: Number, required: true },
     medicalConditions: { type: String, default: "None" },

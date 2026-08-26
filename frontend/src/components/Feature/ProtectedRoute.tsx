@@ -17,10 +17,10 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     <div className=' max-h-max'>
     <AppNavbar />
     </div>
-    <main className="overflow-y-scroll h-[85vh]">
+    <main className="overflow-y-scroll md:overflow-y-auto h-[85vh] md:h-max">
       {children}
     </main>
-    <div className='h-[15vh]'>
+    <div className='h-[15vh] md:hidden'>
     <Footer />
     </div>
   </div>

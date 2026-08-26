@@ -1,38 +1,38 @@
-import { useUser } from '@clerk/clerk-react'
-import { ActivityIcon, BrainCircuit, ChevronRight, Flame, TrendingUp } from 'lucide-react'
-import { Link} from 'react-router'
+import { useAuth, useUser } from '@clerk/clerk-react'
+import { ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
+import { Link } from 'react-router'
+import DayProgram, { type DietPlan, type WorkoutPlan } from '../components/Feature/DayProgram'
+import { getUserDietPlan, getUserPrograms } from '../utils/getRequest'
 
 const Dashboard = () => {
-  const [quickStats,setQuickStats] = useState<any>()
-const demoQuickStats = [
-    { label: 'Calories burned', value: '1,240', detail: 'this week' },
-    { label: 'Protein target', value: '160g', detail: 'daily' },
-    { label: 'Hydration', value: '2.7L', detail: 'today' },
-  ]
-  const [currentRoutine,setCurrentRoutine] = useState<Array<Record<string, string>>>([])
-    const weeklyPlan = [
-  { day: 'Mon', focus: 'Upper body push', intensity: 'Intensity 8/10', time: '42 min' },
-  { day: 'Tue', focus: 'Lower body power', intensity: 'Intensity 7/10', time: '38 min' },
-  { day: 'Wed', focus: 'Mobility + cardio', intensity: 'Recovery', time: '28 min' },
-  { day: 'Thu', focus: 'Strength pull', intensity: 'Intensity 8/10', time: '45 min' },
-  { day: 'Fri', focus: 'Conditioning circuit', intensity: 'Intensity 9/10', time: '30 min' },
-]
-useEffect(()=>{
-  setQuickStats(demoQuickStats)
-setCurrentRoutine(weeklyPlan)
-},[])
-  
-
-
+  const { getToken } = useAuth()
   const { user } = useUser()
+  const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan>()
+  const [dietPlan, setDietPlan] = useState<DietPlan>()
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const query = { status: 'active' }
+
+    Promise.all([
+      getUserPrograms(controller.signal, getToken, query),
+      getUserDietPlan(controller.signal, getToken, query),
+    ]).then(([workoutResult, dietResult]) => {
+      setWorkoutPlan(workoutResult?.clerkUserId?.[0] as WorkoutPlan | undefined)
+      setDietPlan(dietResult?.clerkUserId?.[0] as DietPlan | undefined)
+    }).catch((error) => {
+      if (error.name !== 'AbortError') console.error(error)
+    })
+
+    return () => controller.abort()
+  }, [getToken])
 
   return (
-    <div className="fitness-shell app-shell">
+    <div className="fitness-shell app-shell min-h-auto!">
       <div className="bg-grid" />
-      <main className={`container-shell dashboard-layout ${!currentRoutine.length?"h-[70vh]":"h-auto"}`}>
-        {!currentRoutine.length?<div className='flex items-center justify-center'><section className="welcome-panel flex-col border glass-panel">
+      <main className="container-shell dashboard-layout">
+        {!workoutPlan && !dietPlan && <div className="flex items-center justify-center"><section className="welcome-panel flex-col border glass-panel">
           <div>
             <span className="eyebrow-badge">Hey There, {user?.firstName ?? 'athlete'}</span>
             <h1>Let&apos;s build your next win.</h1>
@@ -41,71 +41,11 @@ setCurrentRoutine(weeklyPlan)
             Generate workout
             <ChevronRight className="h-4 w-4" />
           </Link>
-        </section></div>:null}
-
-        {currentRoutine.length?<><section className="stats-row">
-          {quickStats.map((stat: any) => (
-            <div key={stat.label} className="glass-panel stat-card">
-              <span>{stat.label}</span>
-              <strong>{stat.value}</strong>
-              <small>{stat.detail}</small>
-            </div>
-          ))}
-        </section>
-
-        <section className="content-grid">
-          <div className="glass-panel plan-panel">
-            <div className="panel-header">
-              <div>
-                <p className="uppercase-label">Weekly schedule</p>
-                <h3>Training plan</h3>
-              </div>
-              <button className="text-button">Edit</button>
-            </div>
-
-            <div className="plan-list">
-              {weeklyPlan.map((item) => (
-                <div key={item.day} className="plan-row">
-                  <div className="day-tag">{item.day}</div>
-                  <div className="plan-copy">
-                    <strong>{item.focus}</strong>
-                    <span>{item.intensity}</span>
-                  </div>
-                  <div className="plan-time">{item.time}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="glass-panel coach-panel">
-            <div className="panel-header">
-              <div>
-                <p className="uppercase-label">AI coach</p>
-                <h3>Coach notes</h3>
-              </div>
-              <span className="status-pill green">Ready</span>
-            </div>
-
-            <div className="coach-card">
-              <div className="coach-bubble">
-                <BrainCircuit className="h-5 w-5" />
-              </div>
-              <p>
-                Your recovery is trending well. Increase the load on Thursday and keep your squat form consistent for the next two sessions.
-              </p>
-            </div>
-
-            <ul className="check-list">
-              <li><ActivityIcon className="h-4 w-4" /> Sleep quality improved by 18%</li>
-              <li><TrendingUp className="h-4 w-4" /> Strength trend is positive</li>
-              <li><Flame className="h-4 w-4" /> Fat loss pace is in range</li>
-            </ul>
-          </div>
-        </section></>:null}
+        </section></div>}
+        {(workoutPlan || dietPlan) && <DayProgram workoutPlan={workoutPlan} dietPlan={dietPlan} />}
       </main>
     </div>
   )
 }
-
 
 export default Dashboard

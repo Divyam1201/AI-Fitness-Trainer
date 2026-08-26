@@ -1,9 +1,8 @@
 import express from "express"
-import { handleAddUserNewDietPlan } from "../controllers/dietController.js"
+import { handleAddUserNewDietPlan, handlegetUserDietPlan } from "../controllers/dietController.js"
 
 const dietRouter = express.Router()
 
-// dietRouter
-dietRouter.post('/',handleAddUserNewDietPlan)
+dietRouter.get("/",handlegetUserDietPlan)
 
 export default dietRouter

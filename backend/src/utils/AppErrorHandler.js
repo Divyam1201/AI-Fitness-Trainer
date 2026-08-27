@@ -9,5 +9,8 @@ export class AppError extends Error{
 
 
 export const catchError = (fn)=>(req,res,next)=>{
-    Promise.resolve(fn(req,res,next)).catch(next)
+    Promise.resolve(fn(req,res,next)).catch((error)=>{
+        console.log(error)
+        next()
+    })
 }

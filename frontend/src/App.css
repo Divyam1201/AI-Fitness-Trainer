@@ -805,6 +805,10 @@
   align-items: start;
 }
 
+.profile-layout {
+  grid-template-columns: 1fr;
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -886,6 +890,210 @@ select {
   font-size: 1.1rem;
   color: #fff;
 }
+
+.profile-loading {
+  min-height: 16rem;
+  display: grid;
+  place-items: center;
+}
+
+.profile-overview input {
+  width: 100%;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.8);
+  color: #f8fbff;
+  padding: 0.9rem 1rem;
+}
+
+.profile-overview input::placeholder {
+  color: rgba(226, 232, 240, 0.65);
+}
+
+.plan-history {
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  margin-top: 1.5rem;
+  padding-top: 0.25rem;
+}
+
+.profile-plans {
+  padding: 1.4rem;
+}
+
+.profile-plan-tabs {
+  display: flex;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.profile-plan-tabs button {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.62);
+  color: rgba(226, 232, 240, 0.7);
+  padding: 0.7rem 1rem;
+  font-weight: 650;
+}
+
+.profile-plan-tabs button.selected {
+  border-color: rgba(34, 211, 238, 0.65);
+  background: rgba(34, 211, 238, 0.13);
+  color: #cffafe;
+}
+
+.profile-plan-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.profile-plan-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 3.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 0.8rem;
+  background: rgba(15, 23, 42, 0.5);
+  color: #e2e8f0;
+  padding: 0.8rem 0.9rem;
+  text-align: left;
+  opacity: 0.52;
+}
+
+.profile-plan-option.active {
+  border-color: rgba(52, 211, 153, 0.7);
+}
+
+.profile-plan-option.selected {
+  background: rgba(34, 211, 238, 0.12);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.5);
+  color: #fff;
+  opacity: 1;
+}
+
+.profile-plan-option small {
+  color: #6ee7b7;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.single-plan-view {
+  grid-template-columns: 1fr;
+}
+
+.plan-history-item {
+  position: relative;
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 0.75rem;
+  opacity: 0.48;
+}
+
+.plan-history-item.active {
+  border-color: #34d399;
+  opacity: 1;
+}
+
+.plan-history-item.inactive {
+  opacity: 0.48;
+}
+
+.plan-history-group + .plan-history-group {
+  margin-top: 1.5rem;
+}
+
+.plan-history-group h4 {
+  margin: 1rem 0 0.25rem;
+  color: #bae6fd;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.plan-summary {
+  display: grid;
+  grid-template-columns: 5rem 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  padding-right: 8rem;
+  text-align: left;
+}
+
+.plan-summary span {
+  color: rgba(186, 230, 253, 0.7);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.plan-expand-icon {
+  transition: transform 0.2s ease;
+}
+
+.plan-expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.plan-status-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+}
+
+.plan-status-controls button {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.7);
+  color: rgba(226, 232, 240, 0.62);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.plan-status-controls button.selected {
+  border-color: #34d399;
+  background: rgba(16, 185, 129, 0.18);
+  color: #6ee7b7;
+}
+
+.plan-details {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.plan-detail-row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.35fr) 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  font-size: 0.82rem;
+}
+
+.plan-detail-row span {
+  color: rgba(186, 230, 253, 0.68);
+  text-transform: capitalize;
+}
+
+.plan-detail-row strong {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
 
 .auth-shell {
   min-height: 100vh;

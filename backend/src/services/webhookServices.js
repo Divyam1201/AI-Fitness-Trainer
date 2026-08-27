@@ -4,6 +4,7 @@ import { vapiCallHistoryModel } from "../models/vapiCallHistoryModel.js";
 import { AppError, generateDietAndWorkoutPlan } from "../utils/index.js";
 import { handleAddUserNewExPlan } from "../controllers/exerciseController.js";
 import { handleAddUserNewDietPlan } from "../controllers/dietController.js";
+import { sendUserPlan } from "./serverEvent.js";
 
 const isalreadyProcessed = async ({ eventId, eventType, eventSource }) => {
   try {
@@ -54,6 +55,7 @@ export const processWebhook = async (eventId, event, eventSource) => {
           },
           rawStructuredData:event
         });
+
         if (
           !Object.values(structuredData).some(
             (i) => i === "" || i === null || i === undefined,

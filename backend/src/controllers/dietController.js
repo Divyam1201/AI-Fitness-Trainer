@@ -1,31 +1,36 @@
 import { getAuth } from "@clerk/express";
 import { dietModel } from "../models/dietModel.js";
-import { catchError } from "../utils/AppErrorHandler.js";
+import { AppError, catchError } from "../utils/AppErrorHandler.js";
 
 const handlegetUserDietPlan=catchError(async(req,res)=>{
    const { status } = req.query;
      console.log(status);
-     const { isAuthenticated, userId } = getAuth(req);
+     try {
+      
+     
+     const { userId } = getAuth(req);
    
-     if (!isAuthenticated) {
-       return res.status(401).json({ error: "Unauthorized" }); //
-     }
    
      if (status) {
-       const getDesiredExercisePlan = await dietModel
+       const getDesiredDietPlan = await dietModel
          .find({ status, clerkUserId: userId })
          .select({ _id: 0 });
        return res.json({
          message: "Success",
-         clerkUserId: getDesiredExercisePlan,
+         result: getDesiredDietPlan,
        });
      }
-     console.log(`Request made by Clerk User ID: ${userId}`);
-   
-     return res.status(400).json({
-       message: "Failed status is required",
-       
-     });
+     else{
+       const getUserAllDietPlans = await dietModel
+         .find({clerkUserId: userId })
+         .select({ _id: 0 });
+       return res.json({
+         message: "Success",
+         result: getUserAllDietPlans,
+       });
+     }} catch (error) {
+      throw new AppError(error,500)
+     }
 })
 
 const handleAddUserNewDietPlan = catchError(async (userData) => {

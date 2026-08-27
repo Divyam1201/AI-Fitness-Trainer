@@ -60,6 +60,7 @@ export interface DietPlan {
 interface DayProgramProps {
   workoutPlan?: WorkoutPlan
   dietPlan?: DietPlan
+  mode?: 'workout' | 'diet'
 }
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -86,7 +87,7 @@ const Metadata = ({ plan, label }: { plan?: WorkoutPlan | DietPlan; label: strin
   )
 }
 
-const DayProgram = ({ workoutPlan, dietPlan }: DayProgramProps) => {
+const DayProgram = ({ workoutPlan, dietPlan, mode }: DayProgramProps) => {
   const [selectedDay, setSelectedDay] = useState('Day 1')
   const workoutDay = workoutPlan?.days?.find((day) => day.day === selectedDay)
   const dietDay = dietPlan?.meals?.find((day) => day.day === selectedDay)
@@ -97,9 +98,9 @@ const DayProgram = ({ workoutPlan, dietPlan }: DayProgramProps) => {
   const displayProtein = dietPlan?.macros?.proteinGm || totalProtein
 
   return (
-    <section className="day-program space-y-6">
-      <div className="glass-panel day-selector-panel">
-        <div className="panel-header">
+    <section className="day-program space-y-6 border p-2 rounded-2xl">
+      <div className="glass-panel day-selector-panel rounded-2xl">
+        <div className="panel-header ">
           <div>
             <p className="uppercase-label">Your week</p>
             <h3>Choose a training day</h3>
@@ -128,13 +129,13 @@ const DayProgram = ({ workoutPlan, dietPlan }: DayProgramProps) => {
       </div>
 
       <div className="stats-row">
-        <div className="glass-panel stat-card"><span>Daily calories</span><strong>{displayCalories.toLocaleString()}</strong><small>kcal target</small></div>
-        <div className="glass-panel stat-card"><span>Protein target</span><strong>{displayProtein}g</strong><small>daily</small></div>
-        <div className="glass-panel stat-card"><span>Workout</span><strong className="text-lg!">{workoutPlan?.splitName || 'Training plan'}</strong><small>{workoutDay?.MuscleFocusDay || 'Recovery session'}</small></div>
+        {mode !== 'workout' && <div className="glass-panel stat-card"><span>Daily calories</span><strong>{displayCalories.toLocaleString()}</strong><small>kcal target</small></div>}
+        {mode !== 'workout' && <div className="glass-panel stat-card"><span>Protein target</span><strong>{displayProtein}g</strong><small>daily</small></div>}
+        {mode !== 'diet' && <div className="glass-panel stat-card"><span>Workout</span><strong className="text-lg!">{workoutPlan?.splitName || 'Training plan'}</strong><small>{workoutDay?.MuscleFocusDay || 'Recovery session'}</small></div>}
       </div>
 
-      <div className="content-grid">
-        <div className="glass-panel plan-panel">
+      <div className={`content-grid${mode ? ' single-plan-view' : ''}`}>
+        {mode !== 'diet' && <div className="glass-panel plan-panel">
           <div className="panel-header">
             <div><p className="uppercase-label">{selectedDay}</p><h3>{workoutDay?.MuscleFocusDay || 'Workout details'}</h3></div>
             <Dumbbell className="h-5 w-5 text-cyan-300" />
@@ -154,9 +155,9 @@ const DayProgram = ({ workoutPlan, dietPlan }: DayProgramProps) => {
             )) || <p className="muted-copy">No workout was found for this day.</p>}
           </div>
           <Metadata plan={workoutPlan} label="Plan" />
-        </div>
+        </div>}
 
-        <div className="glass-panel plan-panel">
+        {mode !== 'workout' && <div className="glass-panel plan-panel">
           <div className="panel-header">
             <div><p className="uppercase-label">{selectedDay}</p><h3>Nutrition plan</h3></div>
             <Utensils className="h-5 w-5 text-cyan-300" />
@@ -177,7 +178,7 @@ const DayProgram = ({ workoutPlan, dietPlan }: DayProgramProps) => {
           </div>
           <p className="nutrition-total">Day total: {totalCalories.toLocaleString()} kcal · {totalProtein}g protein</p>
           <Metadata plan={dietPlan} label="Plan" />
-        </div>
+        </div>}
       </div>
     </section>
   )

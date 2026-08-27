@@ -1,7 +1,9 @@
+import { getAuth } from "@clerk/express";
 import { catchError } from "../utils/AppErrorHandler.js";
+import {addClient, removeClient} from "../services/serverEvent.js"
 
 const handleServerEvent = catchError(async(req,res)=>{
-    const {clerkUserId} = req.params
+    const {id:clerkUserId} = getAuth()
 
     res.set({
         "Content-Type":"text/event-stream",

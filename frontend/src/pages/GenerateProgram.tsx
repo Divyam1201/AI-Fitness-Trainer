@@ -86,7 +86,7 @@ const GenerateProgram = () => {
     try {
       // establish event for backend to ping for plan ready
       const es = new EventSource(
-        `${import.meta.env.VITE_API_URL}/api/event/${user.id}`,
+        `${import.meta.env.VITE_API_URL}/api/event`,
       );
       sseRef.current = es;
 

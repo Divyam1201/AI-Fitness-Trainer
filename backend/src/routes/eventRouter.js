@@ -3,6 +3,6 @@ import { handleServerEvent } from '../controllers/serverEventController.js'
 
 const eventRouter = express.Router()
 
-eventRouter.get('/:id',handleServerEvent)
+eventRouter.get('/',handleServerEvent)
 
 export default eventRouter

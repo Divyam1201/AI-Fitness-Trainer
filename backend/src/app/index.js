@@ -51,6 +51,11 @@ app.use('/api/webhook',webhookRouter)
 // app routes 
 app.use(express.json())
 
+app.use("/api/user",authMiddleware,userRouter)
+app.use('/api/dietPlan',authMiddleware,dietRouter)
+app.use('/api/exercisePlan',authMiddleware,exerciseRouter)
+app.use('/api/event',authMiddleware,eventRouter)
+
 // route to check service health 
 app.use('/healthCheck',(req,res)=>{
     res.json({
@@ -67,10 +72,7 @@ app.get("/{*any}",(req,res)=>{
     res.sendFile(path.join(__dirname,'../frontend','dist', "index.html"));
 })
 }
-app.use("/api/user",authMiddleware,userRouter)
-app.use('/api/dietPlan',authMiddleware,dietRouter)
-app.use('/api/exercisePlan',authMiddleware,exerciseRouter)
-app.use('/api/event',authMiddleware,eventRouter)
+
 app.use(errorHandler)
 
 export default app

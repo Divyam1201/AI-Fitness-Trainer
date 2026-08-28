@@ -1,7 +1,6 @@
 import express from 'express'
 import path from 'path'
 import {ENV} from '../lib/env.js'
-import { fileURLToPath } from "url";
 import { clerkMiddleware } from '@clerk/express'
 import { webhookRouter } from '../routes/webhookRouter.js';
 import { connectDB } from '../db/index.js';
@@ -68,11 +67,10 @@ app.get("/{*any}",(req,res)=>{
     res.sendFile(path.join(__dirname,'../frontend','dist', "index.html"));
 })
 }
-app.use(authMiddleware)
-app.use("/api/user",userRouter)
-app.use('/api/dietPlan',dietRouter)
-app.use('/api/exercisePlan',exerciseRouter)
-app.use('/api/event',eventRouter)
+app.use("/api/user",authMiddleware,userRouter)
+app.use('/api/dietPlan',authMiddleware,dietRouter)
+app.use('/api/exercisePlan',authMiddleware,exerciseRouter)
+app.use('/api/event',authMiddleware,eventRouter)
 app.use(errorHandler)
 
 export default app

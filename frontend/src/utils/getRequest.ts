@@ -31,7 +31,7 @@ async function getPlan(signal:AbortSignal,userToken:() => Promise<string | null>
 
     const queryString = queryOpts ? new URLSearchParams(queryOpts).toString() : ''
     try {
-        const url = `${basehostedURL}/api/${endpoint}${queryString ? `?${queryString}` : ''}`
+        const url = `/api/${endpoint}${queryString ? `?${queryString}` : ''}`
         const result = await fetch(url,{signal,headers:{
             Authorization:`Bearer ${token}`
         }})
@@ -61,7 +61,7 @@ const requestUser = async (
     const token = await userToken()
     if (!token) throw new Error('Authentication token unavailable')
 
-    const result = await fetch(`${basehostedURL}/api/user`, {
+    const result = await fetch(`/api/user`, {
         method,
         signal,
         headers: {

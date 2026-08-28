@@ -1,5 +1,3 @@
-const basehostedURL = import.meta.env.VITE_API_URL
-
 interface PlanResponse {
     result?: Array<Record<string, unknown>>
 }

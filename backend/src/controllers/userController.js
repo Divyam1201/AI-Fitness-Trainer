@@ -1,6 +1,7 @@
 import { getAuth } from "@clerk/express"
 import { AppError, catchError } from "../utils/AppErrorHandler.js"
 import { userModel } from "../models/userModel.js"
+import { editUserDets } from "../services/userService.js"
 
 export const handleGetUser=catchError(async(req,res)=>{
     try {
@@ -18,12 +19,8 @@ export const handleGetUser=catchError(async(req,res)=>{
 export const handleUpdateUser=catchError(async(req,res)=>{
          const {userId:clerkUserId} = getAuth(req)
         const {userData} = req.body
-        console.log("exs")
-const result = await userModel.findOneAndUpdate({clerkUserId},{$set:{
-    userData
-}},{returnDocument:"after"}).select({_id:0})
-    res.json({message:"Success",
-        result
-    })
-
+const result = await editUserDets(userData,clerkUserId)
+res.json({message:"Success",
+    result
+})
 })

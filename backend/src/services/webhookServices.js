@@ -5,6 +5,7 @@ import { AppError, generateDietAndWorkoutPlan } from "../utils/index.js";
 import { handleAddUserNewExPlan } from "../controllers/exerciseController.js";
 import { handleAddUserNewDietPlan } from "../controllers/dietController.js";
 import { sendUserPlan } from "./serverEvent.js";
+import { editUserDets } from "./userService.js";
 
 const isalreadyProcessed = async ({ eventId, eventType, eventSource }) => {
   try {
@@ -79,6 +80,7 @@ export const processWebhook = async (eventId, event, eventSource) => {
               ...result["dietPlan"],
             }),
           ]);
+          await editUserDets(structuredData,event.call?.assistantOverrides.variableValues.clerkUserId)
           sendUserPlan(event.call?.assistantOverrides.variableValues.clerkUserId)
         }
 

@@ -1,3 +1,4 @@
+import { userModel } from "../models/userModel.js"
 export const editUserDets = async(userData,clerkUserId)=>{
     const result = await userModel.findOneAndUpdate({clerkUserId},{$set:{
     userData

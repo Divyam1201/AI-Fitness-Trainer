@@ -3,7 +3,7 @@ import { catchError } from "../utils/AppErrorHandler.js";
 import {addClient, removeClient} from "../services/serverEvent.js"
 
 const handleServerEvent = catchError(async(req,res)=>{
-    const {id:clerkUserId} = getAuth()
+    const {id:clerkUserId} = getAuth(req)
 
     res.set({
         "Content-Type":"text/event-stream",

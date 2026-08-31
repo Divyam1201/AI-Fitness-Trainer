@@ -6,15 +6,15 @@ const userSchema = new mongoose.Schema({
         unique:true
     },
     userData:{
-        age: { type: Number, required: true },
-    name:{type: String, required: true},
+        age: { type: Number},
+    name:{type: String},
     gender: {
       type: String,
       enum: ["Male", "Female", "Other"]
       
     },
-    height: { type: String, required: true },
-    weight: { type: String, required: true },
+    height: { type: String },
+    weight: { type: String },
     activityLevel: {
       type: String,
     },
@@ -27,10 +27,10 @@ const userSchema = new mongoose.Schema({
     dietaryPreference: {
       type: String,
     },
-    mealsPerDay: { type: Number, required: true },
+    mealsPerDay: { type: Number },
     medicalConditions: { type: String, default: "None" },
     allergiesOrRestrictions: { type: String, default: "None" },
-    gymDaysPerWeek: { type: Number, min: 0, max: 7, required: true },
+    gymDaysPerWeek: { type: Number, min: 0, max: 7 },
     preferredWorkoutType: {
       type: String,
       enum: ["Strength Training", "Cardio", "Mixed", "Flexibility/Mobility"]

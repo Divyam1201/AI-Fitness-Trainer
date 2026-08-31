@@ -1,3 +1,5 @@
+const baseURL = " http://localhost:3000"
+
 interface PlanResponse {
     result?: Array<Record<string, unknown>>
 }
@@ -29,7 +31,7 @@ async function getPlan(signal:AbortSignal,userToken:() => Promise<string | null>
 
     const queryString = queryOpts ? new URLSearchParams(queryOpts).toString() : ''
     try {
-        const url = `/api/${endpoint}${queryString ? `?${queryString}` : ''}`
+        const url = `${baseURL}/api/${endpoint}${queryString ? `?${queryString}` : ''}`
         const result = await fetch(url,{signal,headers:{
             Authorization:`Bearer ${token}`
         }})
@@ -59,7 +61,7 @@ const requestUser = async (
     const token = await userToken()
     if (!token) throw new Error('Authentication token unavailable')
 
-    const result = await fetch(`/api/user`, {
+    const result = await fetch(`${baseURL}/api/user`, {
         method,
         signal,
         headers: {
@@ -72,4 +74,37 @@ const requestUser = async (
     return await result.json()
 }
 
-export { getUserPrograms, getUserDietPlan, requestUser }
+export interface GenerateProgramRequest {
+    goal: string
+    experience: string
+    sessionLength: string
+    equipment: string
+}
+
+export interface GenerateProgramResponse {
+    message: string
+    [key: string]: unknown
+}
+
+const generateProgram = async (
+    signal: AbortSignal,
+    userToken: () => Promise<string | null>,
+    programData: GenerateProgramRequest,
+): Promise<GenerateProgramResponse> => {
+    const token = await userToken()
+    if (!token) throw new Error('Authentication token unavailable')
+
+    const result = await fetch(`${baseURL}/api/ai`, {
+        method: 'POST',
+        signal,
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(programData),
+    })
+    if (!result.ok) throw new Error(`Generate program request failed with status ${result.status}`)
+    return await result.json()
+}
+
+export { getUserPrograms, getUserDietPlan, requestUser, generateProgram }

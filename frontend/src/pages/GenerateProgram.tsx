@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Label } from "../components/ui/label";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useAuth } from "@clerk/clerk-react";
 import {
   CalendarCheck2,
   Sparkles,
@@ -28,17 +28,63 @@ import {
 import * as VapiModule from "@vapi-ai/web";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router";
+import { requestUser, generateProgram, type UserData } from "../utils/getRequest";
 
 const GenerateProgram = () => {
   const { user } = useUser();
+  const { getToken } = useAuth();
+  const [userData, setUserData] = useState<UserData>({ name: user?.firstName || user?.fullName || "" });
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [userLoadError, setUserLoadError] = useState<string | null>(null);
+  
+  // Form state
+  const [goal, setGoal] = useState("strength");
+  const [experience, setExperience] = useState("intermediate");
+  const [sessionLength, setSessionLength] = useState("45");
+  const [equipment, setEquipment] = useState("home");
+  
+  // Generate program state
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [generateError, setGenerateError] = useState<string | null>(null);
+  
+  // VAPI state
   const [isCallActive, setIsCallActive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [callError, setCallError] = useState<string | null>(null);
   const vapiClientRef = useRef<any>(null);
   const sseRef = useRef<any>(null);
+  const statusIntervalRef = useRef<NodeJS.Timeout>();
   const navigate = useNavigate();
   // @ts-ignore
   const Vapi = VapiModule.default.default;
+  
+  // Status messages that cycle
+  const statusMessages = [
+    "AI thinking...",
+    "Considering your goals...",
+    "Analyzing your plan...",
+    "Generating workouts...",
+    "Creating meal plans...",
+    "Finalizing your program...",
+  ];
+  
+  // Fetch user details on mount
+  useEffect(() => {
+    const controller = new AbortController();
+    requestUser(controller.signal, getToken, 'GET')
+      .then((userResult: any) => {
+        const loadedData = userResult.result?.[0]?.userData ?? {};
+        setUserData({ name: loadedData.name || user?.fullName || user?.firstName || "", ...loadedData });
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.name !== 'AbortError') setUserLoadError('Unable to load your profile.');
+      })
+      .finally(() => setIsLoadingUser(false));
+    
+    return () => controller.abort();
+  }, [getToken, user]);
   // Initialize VAPI client
   useEffect(() => {
     const apiKey = import.meta.env.VITE_VAPI_API_KEY;
@@ -75,6 +121,13 @@ const GenerateProgram = () => {
     return () => {
       client.stop();
     };
+  }, [Vapi]);
+  
+  // Cleanup status interval on unmount
+  useEffect(() => {
+    return () => {
+      if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
+    };
   }, []);
 
   const handleStartCall = async () => {
@@ -101,7 +154,7 @@ const GenerateProgram = () => {
       // Start the call with user's name as a variable
       await vapiClientRef.current.start(assistantId, {
         variableValues: {
-          name: user.fullName || user.firstName || "there",
+          name:user?.firstName || user?.fullName  || "there",
           clerkUserId: user.id,
           userEmail: user.primaryEmailAddress?.emailAddress || "",
         },
@@ -120,6 +173,49 @@ const GenerateProgram = () => {
       vapiClientRef.current.stop();
     }
   };
+  
+  const handleGenerateProgram = async () => {
+    if (!getToken) return;
+    
+    setIsGenerating(true);
+    setGenerateError(null);
+    let messageIndex = 0;
+    
+    // Start cycling through status messages
+    statusIntervalRef.current = setInterval(() => {
+      setStatusMessage(statusMessages[messageIndex % statusMessages.length]);
+      messageIndex++;
+    }, 2000); // Change message every 2 seconds
+    
+    try {
+      const controller = new AbortController();
+      const response = await generateProgram(controller.signal, getToken, {
+        goal,
+        experience,
+        sessionLength,
+        equipment,
+      });
+      
+      if (response.message === 'success' || response.message?.toLowerCase().includes('success')) {
+        if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
+        setStatusMessage("Program generated successfully!");
+        // Navigate to dashboard after a short delay
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 500);
+      } else {
+        throw new Error(response.message || 'Failed to generate program');
+      }
+    } catch (error) {
+      if (statusIntervalRef.current) clearInterval(statusIntervalRef.current);
+      console.error("Failed to generate program:", error);
+      setGenerateError(
+        error instanceof Error ? error.message : "Failed to generate program"
+      );
+      setStatusMessage("");
+      setIsGenerating(false);
+    }
+  };
 
   const programs = [
     "Strength foundation",
@@ -128,96 +224,13 @@ const GenerateProgram = () => {
     "Athletic conditioning",
   ];
 
-  const userName = user?.fullName || user?.firstName || "Athlete";
+  const userName = user?.firstName || user?.fullName || "Athlete";
 
   return (
     <div className="fitness-shell app-shell md:min-h-auto! md:pb-5!">
       <div className="bg-grid" />
 
-      <main className="container-shell generate-layout ">
-        <Card className="form-panel">
-          <CardHeader>
-            <CardTitle>Generate a fitness program</CardTitle>
-            <CardDescription>
-              Build a plan tailored to your goals and equipment
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Main goal</Label>
-                <Select defaultValue="strength">
-                  <SelectTrigger className="text-xs md:text-sm">
-                    <SelectValue placeholder="Select goal" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="strength">Build strength</SelectItem>
-                    <SelectItem value="fat-loss">Lose fat</SelectItem>
-                    <SelectItem value="muscle">Gain lean muscle</SelectItem>
-                    <SelectItem value="conditioning">
-                      Improve conditioning
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Experience</Label>
-                <Select defaultValue="intermediate">
-                  <SelectTrigger className="text-xs md:text-sm">
-                    <SelectValue placeholder="Select experience" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">Beginner</SelectItem>
-                    <SelectItem value="intermediate">Intermediate</SelectItem>
-                    <SelectItem value="advanced">Advanced</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Session length</Label>
-                <Select defaultValue="45">
-                  <SelectTrigger className="text-xs md:text-sm">
-                    <SelectValue placeholder="Select duration" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="30">30 min</SelectItem>
-                    <SelectItem value="45">45 min</SelectItem>
-                    <SelectItem value="60">60 min</SelectItem>
-                    <SelectItem value="75">75 min</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Equipment</Label>
-                <Select defaultValue="home">
-                  <SelectTrigger className="text-xs md:text-sm">
-                    <SelectValue placeholder="Select equipment" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="home">Home gym</SelectItem>
-                    <SelectItem value="full-gym">Full gym</SelectItem>
-                    <SelectItem value="bodyweight">Bodyweight only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <Button className="w-full" type="button">
-              <Sparkles className="mr-2 h-4 w-4" />
-              Generate program
-            </Button>
-          </CardContent>
-        </Card>
-        <div className="flex flex-col md:flex-row">
-          <div className="flex md:flex-col items-center justify-center gap-5">
-            {/* <hr className='w-20 md:rotate-90'></hr>
-             */}
-            <p className="flex m-2">or</p>
-            {/* <hr className='w-20 md:rotate-90 '></hr> */}
-          </div>
+      <main className="container-shell generate-layout">
           <Card className="program-preview p-2!">
             <CardHeader>
               <CardTitle>Program preview</CardTitle>
@@ -308,7 +321,105 @@ const GenerateProgram = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+          <div className="flex md:flex-col items-center justify-center h-full gap-5">
+            {/* <hr className='w-20 md:rotate-90'></hr>
+             */}
+            <p className="flex m-2 text-2xl">or</p>
+            {/* <hr className='w-20 md:rotate-90 '></hr> */}
+          </div>
+        <Card className="form-panel">
+          <CardHeader>
+            <CardTitle>Generate a fitness program</CardTitle>
+            <CardDescription>
+              Build a plan tailored to your goals and equipment
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Main goal</Label>
+                <Select value={goal} onValueChange={setGoal} disabled={isGenerating}>
+                  <SelectTrigger className="text-xs md:text-sm">
+                    <SelectValue placeholder="Select goal" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="strength">Build strength</SelectItem>
+                    <SelectItem value="fat-loss">Lose fat</SelectItem>
+                    <SelectItem value="muscle">Gain lean muscle</SelectItem>
+                    <SelectItem value="conditioning">
+                      Improve conditioning
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Experience</Label>
+                <Select value={experience} onValueChange={setExperience} disabled={isGenerating}>
+                  <SelectTrigger className="text-xs md:text-sm">
+                    <SelectValue placeholder="Select experience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Session length</Label>
+                <Select value={sessionLength} onValueChange={setSessionLength} disabled={isGenerating}>
+                  <SelectTrigger className="text-xs md:text-sm">
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="30">30 min</SelectItem>
+                    <SelectItem value="45">45 min</SelectItem>
+                    <SelectItem value="60">60 min</SelectItem>
+                    <SelectItem value="75">75 min</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Equipment</Label>
+                <Select value={equipment} onValueChange={setEquipment} disabled={isGenerating}>
+                  <SelectTrigger className="text-xs md:text-sm">
+                    <SelectValue placeholder="Select equipment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="home">Home gym</SelectItem>
+                    <SelectItem value="full-gym">Full gym</SelectItem>
+                    <SelectItem value="bodyweight">Bodyweight only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <Button 
+              className={cn("w-full", isGenerating && "opacity-70")} 
+              type="button"
+              onClick={handleGenerateProgram}
+              disabled={isGenerating}
+            >
+              {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {!isGenerating && <Sparkles className="mr-2 h-4 w-4" />}
+              <span>{isGenerating ? statusMessage || "Initializing..." : "Generate program"}</span>
+            </Button>
+            
+            {generateError && (
+              <div
+                className="flex items-center gap-2 text-sm text-destructive p-3 bg-destructive/10 border border-destructive/20 rounded-lg"
+                role="alert"
+              >
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {generateError}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        
       </main>
     </div>
   );

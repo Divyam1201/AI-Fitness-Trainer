@@ -799,10 +799,15 @@
   color: rgba(226, 232, 240, 0.86);
 }
 
-.generate-layout,
+
 .profile-layout {
   grid-template-columns: 1.2fr 0.8fr;
   align-items: start;
+}
+
+.generate-layout{
+ grid-template-columns: 1.2fr 0.8fr 1.2fr;
+ align-items: center;
 }
 
 .profile-layout {

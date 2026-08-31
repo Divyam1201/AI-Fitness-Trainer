@@ -6,6 +6,7 @@ import { handleAddUserNewExPlan } from "../controllers/exerciseController.js";
 import { handleAddUserNewDietPlan } from "../controllers/dietController.js";
 import { sendUserPlan } from "./serverEvent.js";
 import { editUserDets } from "./userService.js";
+import { generateAndStoreNewPlan } from "../utils/generateAndStoreNewPlan.js";
 
 const isalreadyProcessed = async ({ eventId, eventType, eventSource }) => {
   try {
@@ -47,10 +48,11 @@ export const processWebhook = async (eventId, event, eventSource) => {
         return "clerk webhook processed";
       } else {
         const structuredData = event.analysis.structuredData;
+        const clerkUserId = event.call?.assistantOverrides.variableValues.clerkUserId
+        const callId = event.call.id
         await vapiCallHistoryModel.create({
-          clerkUserId:
-            event.call?.assistantOverrides.variableValues.clerkUserId,
-          callId: event.call.id,
+          clerkUserId,
+          callId,
           intake: {
             ...structuredData,
           },
@@ -62,31 +64,13 @@ export const processWebhook = async (eventId, event, eventSource) => {
             (i) => i === "" || i === null || i === undefined,
           )
         ) {
-          const result = await generateDietAndWorkoutPlan(structuredData);
-          await Promise.all([
-            handleAddUserNewExPlan({
-              clerkUserId:
-                event.call?.assistantOverrides.variableValues.clerkUserId,
-              vapiCallId: event.call?.id,
-              status: "active",
-              daysPerWeek: structuredData.gymDaysPerWeek,
-              ...result.exercisePlan,
-            }),
-            handleAddUserNewDietPlan({
-              clerkUserId:
-                event.call?.assistantOverrides.variableValues.clerkUserId,
-              vapiCallId: event.call?.id,
-              status: "active",
-              ...result["dietPlan"],
-            }),
-          ]);
-          await editUserDets(structuredData,event.call?.assistantOverrides.variableValues.clerkUserId)
-          sendUserPlan(event.call?.assistantOverrides.variableValues.clerkUserId)
+          await generateAndStoreNewPlan(structuredData,clerkUserId ,callId)
         }
 
         return "vapi webhook processed";
       }
     }
+    return "webhook already processed"
   } catch (err) {
     console.error(`Error processing ${eventSource} webhook:`, err.message);
     // Return 500 so Clerk retries later

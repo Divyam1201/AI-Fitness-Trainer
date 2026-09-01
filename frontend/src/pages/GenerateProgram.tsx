@@ -29,19 +29,20 @@ import * as VapiModule from "@vapi-ai/web";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router";
 import { requestUser, generateProgram, type UserData } from "../utils/getRequest";
+import { validateObject } from "../utils/helper";
 
 const GenerateProgram = () => {
   const { user } = useUser();
   const { getToken } = useAuth();
   const [userData, setUserData] = useState<UserData>({ name: user?.firstName || user?.fullName || "" });
   const [isLoadingUser, setIsLoadingUser] = useState(true);
-  const [userLoadError, setUserLoadError] = useState<string | null>(null);
+  // const [userLoadError, setUserLoadError] = useState<string | null>(null);
   
   // Form state
-  const [goal, setGoal] = useState("strength");
-  const [experience, setExperience] = useState("intermediate");
-  const [sessionLength, setSessionLength] = useState("45");
-  const [equipment, setEquipment] = useState("home");
+  const [fitnessGoal, setFitnessGoal] = useState("Build strength");
+  const [fitnessLevel, setFitnessLevel] = useState("Intermediate");
+  const [workoutType, setWorkoutType] = useState("Strength Training");
+  const [gymDaysPerWeek, setGymDaysPerWeek] = useState("6");
   
   // Generate program state
   const [isGenerating, setIsGenerating] = useState(false);
@@ -54,7 +55,7 @@ const GenerateProgram = () => {
   const [callError, setCallError] = useState<string | null>(null);
   const vapiClientRef = useRef<any>(null);
   const sseRef = useRef<any>(null);
-  const statusIntervalRef = useRef<NodeJS.Timeout>();
+  const statusIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(null);
   const navigate = useNavigate();
   // @ts-ignore
   const Vapi = VapiModule.default.default;
@@ -79,7 +80,7 @@ const GenerateProgram = () => {
       })
       .catch((error) => {
         console.log(error);
-        if (error.name !== 'AbortError') setUserLoadError('Unable to load your profile.');
+        // if (error.name !== 'AbortError') setUserLoadError('Unable to load your profile.');
       })
       .finally(() => setIsLoadingUser(false));
     
@@ -88,7 +89,6 @@ const GenerateProgram = () => {
   // Initialize VAPI client
   useEffect(() => {
     const apiKey = import.meta.env.VITE_VAPI_API_KEY;
-    console.log(apiKey);
     if (!apiKey) {
       console.warn(
         "VAPI API key not configured. Please set VITE_VAPI_API_KEY in .env",
@@ -157,6 +157,10 @@ const GenerateProgram = () => {
           name:user?.firstName || user?.fullName  || "there",
           clerkUserId: user.id,
           userEmail: user.primaryEmailAddress?.emailAddress || "",
+          // age:userData.age,
+          //       height: `${userData.height} cm`,
+          //       weight: `${userData.weight} kg`,
+          //       gender: userData.gender,
         },
       });
     } catch (error) {
@@ -177,6 +181,11 @@ const GenerateProgram = () => {
   const handleGenerateProgram = async () => {
     if (!getToken) return;
     
+    if(!validateObject(userData,["fitnessGoal",
+        "fitnessLevel",
+        "preferredWorkoutType",
+        "gymDaysPerWeek",]).isValid) return setGenerateError("To proceed first fill up your details in profile")
+
     setIsGenerating(true);
     setGenerateError(null);
     let messageIndex = 0;
@@ -189,11 +198,13 @@ const GenerateProgram = () => {
     
     try {
       const controller = new AbortController();
+      const {name, ...otherDets} = userData
       const response = await generateProgram(controller.signal, getToken, {
-        goal,
-        experience,
-        sessionLength,
-        equipment,
+...otherDets,
+        fitnessGoal,
+        fitnessLevel,
+        preferredWorkoutType:workoutType,
+        gymDaysPerWeek,
       });
       
       if (response.message === 'success' || response.message?.toLowerCase().includes('success')) {
@@ -229,7 +240,6 @@ const GenerateProgram = () => {
   return (
     <div className="fitness-shell app-shell md:min-h-auto! md:pb-5!">
       <div className="bg-grid" />
-
       <main className="container-shell generate-layout">
           <Card className="program-preview p-2!">
             <CardHeader>
@@ -283,7 +293,7 @@ const GenerateProgram = () => {
                     isConnecting && "opacity-70",
                   )}
                   onClick={isCallActive ? handleEndCall : handleStartCall}
-                  disabled={isConnecting}
+                  disabled={isConnecting || isLoadingUser ||isGenerating}
                   type="button"
                 >
                   {isConnecting && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -331,67 +341,68 @@ const GenerateProgram = () => {
           <CardHeader>
             <CardTitle>Generate a fitness program</CardTitle>
             <CardDescription>
-              Build a plan tailored to your goals and equipment
+              Build a plan tailored to your goals
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Main goal</Label>
-                <Select value={goal} onValueChange={setGoal} disabled={isGenerating}>
+                <Label>Fitness Goal</Label>
+                <Select value={fitnessGoal} onValueChange={setFitnessGoal} disabled={isGenerating}>
                   <SelectTrigger className="text-xs md:text-sm">
-                    <SelectValue placeholder="Select goal" />
+                    <SelectValue placeholder="Select fitnessGoal" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="strength">Build strength</SelectItem>
-                    <SelectItem value="fat-loss">Lose fat</SelectItem>
-                    <SelectItem value="muscle">Gain lean muscle</SelectItem>
-                    <SelectItem value="conditioning">
-                      Improve conditioning
+                    <SelectItem value="Build strength">Improve Health</SelectItem>
+                    <SelectItem value="Lose fat">Lose fat</SelectItem>
+                    <SelectItem value="Gain lean muscle">Gain muscle</SelectItem>
+                    <SelectItem value="Improve conditioning">
+                      Maintain Health
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Experience</Label>
-                <Select value={experience} onValueChange={setExperience} disabled={isGenerating}>
+                <Label>Fitness Level</Label>
+                <Select value={fitnessLevel} onValueChange={setFitnessLevel} disabled={isGenerating}>
                   <SelectTrigger className="text-xs md:text-sm">
-                    <SelectValue placeholder="Select experience" />
+                    <SelectValue placeholder="Select fitnessLevel" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="beginner">Beginner</SelectItem>
-                    <SelectItem value="intermediate">Intermediate</SelectItem>
-                    <SelectItem value="advanced">Advanced</SelectItem>
+                    <SelectItem value="Beginner">Beginner</SelectItem>
+                    <SelectItem value="Intermediate">Intermediate</SelectItem>
+                    <SelectItem value="Advanced">Advanced</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Session length</Label>
-                <Select value={sessionLength} onValueChange={setSessionLength} disabled={isGenerating}>
+                <Label>Workout Type</Label>
+                <Select value={workoutType} onValueChange={setWorkoutType} disabled={isGenerating}>
                   <SelectTrigger className="text-xs md:text-sm">
                     <SelectValue placeholder="Select duration" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="30">30 min</SelectItem>
-                    <SelectItem value="45">45 min</SelectItem>
-                    <SelectItem value="60">60 min</SelectItem>
-                    <SelectItem value="75">75 min</SelectItem>
+                    <SelectItem value="Strength Training">Strength Training</SelectItem>
+                    <SelectItem value="Cardio">Cardio</SelectItem>
+                    <SelectItem value="Mixed">Mixed</SelectItem>
+                    <SelectItem value="Flexibility/Mobility">Flexibility/Mobility</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Equipment</Label>
-                <Select value={equipment} onValueChange={setEquipment} disabled={isGenerating}>
+                <Label>Gym Days Per Week</Label>
+                <Select value={gymDaysPerWeek} onValueChange={setGymDaysPerWeek} disabled={isGenerating}>
                   <SelectTrigger className="text-xs md:text-sm">
-                    <SelectValue placeholder="Select equipment" />
+                    <SelectValue placeholder="Select gymDaysPerWeek" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="home">Home gym</SelectItem>
-                    <SelectItem value="full-gym">Full gym</SelectItem>
-                    <SelectItem value="bodyweight">Bodyweight only</SelectItem>
+                    <SelectItem value="3">3</SelectItem>
+                    <SelectItem value="4">4</SelectItem>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="6">6</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -401,7 +412,7 @@ const GenerateProgram = () => {
               className={cn("w-full", isGenerating && "opacity-70")} 
               type="button"
               onClick={handleGenerateProgram}
-              disabled={isGenerating}
+              disabled={isGenerating || isCallActive || isLoadingUser ||isConnecting}
             >
               {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {!isGenerating && <Sparkles className="mr-2 h-4 w-4" />}
@@ -417,6 +428,8 @@ const GenerateProgram = () => {
                 {generateError}
               </div>
             )}
+
+            
           </CardContent>
         </Card>
         

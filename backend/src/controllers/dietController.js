@@ -4,7 +4,7 @@ import { AppError, catchError } from "../utils/AppErrorHandler.js";
 
 const handlegetUserDietPlan=catchError(async(req,res)=>{
    const { status } = req.query;
-     console.log(status);
+    //  console.log(status);
      try {
       
      
@@ -39,6 +39,6 @@ const handleAddUserNewDietPlan = catchError(async (userData) => {
     { $set: { status: "inactive" } },
   );
   const addPlan = await dietModel.create(userData);
-  console.log(addPlan)
+  // console.log(addPlan)
 });
 export { handlegetUserDietPlan, handleAddUserNewDietPlan };

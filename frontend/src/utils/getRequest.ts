@@ -1,4 +1,3 @@
-const baseURL = " http://localhost:3000"
 
 interface PlanResponse {
     result?: Array<Record<string, unknown>>
@@ -31,7 +30,7 @@ async function getPlan(signal:AbortSignal,userToken:() => Promise<string | null>
 
     const queryString = queryOpts ? new URLSearchParams(queryOpts).toString() : ''
     try {
-        const url = `${baseURL}/api/${endpoint}${queryString ? `?${queryString}` : ''}`
+        const url = `/api/${endpoint}${queryString ? `?${queryString}` : ''}`
         const result = await fetch(url,{signal,headers:{
             Authorization:`Bearer ${token}`
         }})
@@ -61,7 +60,7 @@ const requestUser = async (
     const token = await userToken()
     if (!token) throw new Error('Authentication token unavailable')
 
-    const result = await fetch(`${baseURL}/api/user`, {
+    const result = await fetch(`/api/user`, {
         method,
         signal,
         headers: {
@@ -73,12 +72,21 @@ const requestUser = async (
     if (!result.ok) throw new Error(`User request failed with status ${result.status}`)
     return await result.json()
 }
-
 export interface GenerateProgramRequest {
-    goal: string
-    experience: string
-    sessionLength: string
-    equipment: string
+    age?: number
+    name?: string
+    gender?: 'Male' | 'Female' | 'Other'
+    height?: string
+    weight?: string
+    activityLevel?: string
+    dietaryPreference?: string
+    mealsPerDay?: number
+    medicalConditions?: string
+    allergiesOrRestrictions?: string
+    fitnessGoal: string
+    fitnessLevel: string
+    preferredWorkoutType: string
+    gymDaysPerWeek: string
 }
 
 export interface GenerateProgramResponse {
@@ -93,8 +101,7 @@ const generateProgram = async (
 ): Promise<GenerateProgramResponse> => {
     const token = await userToken()
     if (!token) throw new Error('Authentication token unavailable')
-
-    const result = await fetch(`${baseURL}/api/ai`, {
+    const result = await fetch(`/api/ai`, {
         method: 'POST',
         signal,
         headers: {

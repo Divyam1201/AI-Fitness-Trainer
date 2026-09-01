@@ -11,6 +11,7 @@ import cors from 'cors';
 import eventRouter from '../routes/eventRouter.js';
 import userRouter from '../routes/userRouter.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
+import aiRouter from '../routes/aiRouter.js';
 
 // dynamic path for finding files in production 
 const __dirname = path.resolve()
@@ -55,6 +56,7 @@ app.use("/api/user",authMiddleware,userRouter)
 app.use('/api/dietPlan',authMiddleware,dietRouter)
 app.use('/api/exercisePlan',authMiddleware,exerciseRouter)
 app.use('/api/event',authMiddleware,eventRouter)
+app.use('/api/ai',authMiddleware,aiRouter)
 
 // route to check service health 
 app.use('/healthCheck',(req,res)=>{

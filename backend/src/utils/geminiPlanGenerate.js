@@ -61,7 +61,7 @@ macros:{
 
   const result = await googleGemini.generateContent(prompt);
   const text = result.response.text();
-  console.log(text)
+  // console.log(text)
   return JSON.parse(text.replace(/```json|```/g, '').trim());
 }
 

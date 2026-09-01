@@ -40,7 +40,7 @@ const MacrosSchema = new Schema(
 const DietPlanSchema = new Schema(
   {
     clerkUserId: { type: String, required: true, index: true },
-    vapiCallId: { type: String,unique:true,required:false, }, 
+    vapiCallId: { type: String }, 
     dailyCalorieTarget: { type: Number, required: true },
     macros: { type: MacrosSchema, required: true },
     meals: { type: [DailyMealsSchema], required: true },
